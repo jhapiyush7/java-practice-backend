@@ -22,7 +22,7 @@ public class UserController {
         return new ResponseEntity<>(createdUserDto, HttpStatus.CREATED);
     }
 
-    @GetMapping("/{id}/hello")
+    @GetMapping("/{id}")
     public ResponseEntity<UserDto> getUserById(@PathVariable Integer id) throws SQLException, ClassNotFoundException {
         UserDto userDto = this.userServices.getUserById(id);
         return ResponseEntity.ok(userDto);
@@ -32,5 +32,11 @@ public class UserController {
     public ResponseEntity<List<UserDto>> getAllUsers() throws SQLException, ClassNotFoundException {
         List<UserDto> userSet = this.userServices.getAllUsers();
         return ResponseEntity.ok(userSet);
+    }
+
+    @PutMapping("/{id}/update")
+    public ResponseEntity<UserDto> updateUser(@RequestBody UserDto user, @PathVariable int id) throws SQLException, ClassNotFoundException {
+        UserDto userDto = this.userServices.updateUser(user, id);
+        return ResponseEntity.ok(userDto);
     }
 }

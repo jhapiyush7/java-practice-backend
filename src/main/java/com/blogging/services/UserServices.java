@@ -9,7 +9,7 @@ import java.util.List;
 public interface UserServices {
     UserDto createUser(UserDto user) throws SQLException, ClassNotFoundException;
 
-    UserDto updateUser(UserDto user, Integer id);
+    UserDto updateUser(UserDto user, Integer id) throws SQLException, ClassNotFoundException;
 
     UserDto getUserById(Integer id) throws SQLException, ClassNotFoundException;
 

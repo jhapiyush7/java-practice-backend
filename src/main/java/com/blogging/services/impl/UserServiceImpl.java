@@ -39,8 +39,23 @@ public class UserServiceImpl implements UserServices {
     }
 
     @Override
-    public UserDto updateUser(UserDto user, Integer id) {
-
+    public UserDto updateUser(UserDto user, Integer id) throws SQLException, ClassNotFoundException {
+        String updateUserQuery = "UPDATE user SET about=?,email=?,name=?,password=? where id=?";
+        try (Connection conn = getConnection()) {
+            PreparedStatement ps = conn.prepareStatement(updateUserQuery);
+            fillQuery(ps, user);
+            ps.setInt(5, id);
+            int updateCount = ps.executeUpdate();
+            if (updateCount != 0) {
+                log.info("Data inserted in DB for user: " + user);
+                return user;
+            } else {
+                log.warning("Failed to insert in DB for user: " + user);
+                return null;
+            }
+        } catch (Exception e) {
+            log.severe("Error while connecting with DB: " + e);
+        }
         return null;
     }
 
