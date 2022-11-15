@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -20,8 +21,8 @@ public class UserServiceImpl implements UserServices {
     @Override
     public UserDto createUser(UserDto user) throws SQLException, ClassNotFoundException {
         String createUserQuery = "INSERT into user(about,email,name,password) values(?,?,?,?)";
-        try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(createUserQuery);) {
+        try (Connection conn = getConnection()) {
+            PreparedStatement ps = conn.prepareStatement(createUserQuery);
             fillQuery(ps, user);
             int updateCount = ps.executeUpdate();
             if (updateCount != 0) {
@@ -32,7 +33,7 @@ public class UserServiceImpl implements UserServices {
                 return null;
             }
         } catch (Exception e) {
-            System.out.println("Error connecting to DB: " + e);
+            log.severe("Error connecting to DB: " + e);
         }
         return null;
     }
@@ -51,7 +52,7 @@ public class UserServiceImpl implements UserServices {
         try {
             conn = getConnection();
         } catch (Exception e) {
-            System.out.println("Error while connecting to DB: " + e);
+            log.severe("Error while connecting to DB: " + e);
             return null;
         }
         PreparedStatement ps = conn.prepareStatement(getUserByIdQuery);
@@ -64,7 +65,19 @@ public class UserServiceImpl implements UserServices {
     }
 
     @Override
-    public List<User> getAllUsers() {
+    public List<UserDto> getAllUsers() throws SQLException, ClassNotFoundException {
+        String getAllUsersQuery = "SELECT * FROM user";
+        try (Connection conn = getConnection()) {
+            List<UserDto> userSet = new ArrayList<>();
+            PreparedStatement ps = conn.prepareStatement(getAllUsersQuery);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                userSet.add(fillUserDto(rs));
+            }
+            return userSet;
+        } catch (Exception e) {
+            log.severe("Error connecting to DB: " + e);
+        }
         return null;
     }
 
@@ -97,12 +110,12 @@ public class UserServiceImpl implements UserServices {
         try {
             Class<?> className = Class.forName("com.mysql.cj.jdbc.Driver");
         } catch (ClassNotFoundException e) {
-            System.out.println("Error Occured: " + e);
+            log.severe("DB Class not found error: " + e);
         }
         try {
             Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/blogging", "root", "root");
         } catch (SQLException e) {
-            System.out.println("Error while connecting to DB: " + e);
+            log.severe("Error while connecting to DB: " + e);
             return null;
         }
         return DriverManager.getConnection("jdbc:mysql://localhost:3306/blogging", "root", "root");

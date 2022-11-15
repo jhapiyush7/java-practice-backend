@@ -13,7 +13,7 @@ public interface UserServices {
 
     UserDto getUserById(Integer id) throws SQLException, ClassNotFoundException;
 
-    List<User> getAllUsers();
+    List<UserDto> getAllUsers() throws SQLException, ClassNotFoundException;
 
     void deleteUserById(Integer id);
 }

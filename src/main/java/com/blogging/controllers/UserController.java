@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.SQLException;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/users")
@@ -25,5 +26,11 @@ public class UserController {
     public ResponseEntity<UserDto> getUserById(@PathVariable Integer id) throws SQLException, ClassNotFoundException {
         UserDto userDto = this.userServices.getUserById(id);
         return ResponseEntity.ok(userDto);
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<UserDto>> getAllUsers() throws SQLException, ClassNotFoundException {
+        List<UserDto> userSet = this.userServices.getAllUsers();
+        return ResponseEntity.ok(userSet);
     }
 }
