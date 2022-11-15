@@ -48,4 +48,11 @@ public class UserController {
         return deleted ? ResponseEntity.ok(new ApiResponse("Deleted user Successfully", true)) :
                 ResponseEntity.ok(new ApiResponse("Failed to Delete User", false));
     }
+
+    @PostMapping("/batch")
+    public ResponseEntity<ApiResponse> createUserInBatch(@RequestBody List<UserDto> users) throws SQLException, ClassNotFoundException {
+        boolean allAdded = this.userServices.createUserInBatch(users);
+        return allAdded ? ResponseEntity.ok(new ApiResponse("All users added Successfully", true)) :
+                ResponseEntity.ok(new ApiResponse("Failed to add all/some users", false));
+    }
 }

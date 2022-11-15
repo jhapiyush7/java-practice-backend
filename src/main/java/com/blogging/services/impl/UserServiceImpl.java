@@ -121,6 +121,30 @@ public class UserServiceImpl implements UserServices {
         return false;
     }
 
+    @Override
+    public boolean createUserInBatch(List<UserDto> users) throws SQLException, ClassNotFoundException {
+        log.info("createUserInBatch started for user size: " + users.size());
+        String createUserQuery = "INSERT into user(about,email,name,password) values(?,?,?,?)";
+        try (Connection conn = getConnection()) {
+            PreparedStatement ps = conn.prepareStatement(createUserQuery);
+            int updateCount = 0;
+            for (UserDto user : users) {
+                fillQuery(ps, user);
+                updateCount += ps.executeUpdate();
+            }
+            if (updateCount == users.size()) {
+                log.info("Inserted all records in DB successfully");
+                return true;
+            } else {
+                log.severe("All/Some records were not inserted");
+                return false;
+            }
+        } catch (Exception e) {
+            log.severe("Error connecting to DB: " + e);
+        }
+        return false;
+    }
+
     private User dtoToUser(UserDto userDto) {
         User user = new User();
         user.setId(userDto.getId());
