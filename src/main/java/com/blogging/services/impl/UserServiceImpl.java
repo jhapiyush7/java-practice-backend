@@ -20,6 +20,7 @@ public class UserServiceImpl implements UserServices {
 
     @Override
     public UserDto createUser(UserDto user) throws SQLException, ClassNotFoundException {
+        log.info("createUser started for user: " + user);
         String createUserQuery = "INSERT into user(about,email,name,password) values(?,?,?,?)";
         try (Connection conn = getConnection()) {
             PreparedStatement ps = conn.prepareStatement(createUserQuery);
@@ -40,6 +41,7 @@ public class UserServiceImpl implements UserServices {
 
     @Override
     public UserDto updateUser(UserDto user, Integer id) throws SQLException, ClassNotFoundException {
+        log.info("updateUser started for id: " + id);
         String updateUserQuery = "UPDATE user SET about=?,email=?,name=?,password=? where id=?";
         try (Connection conn = getConnection()) {
             PreparedStatement ps = conn.prepareStatement(updateUserQuery);
@@ -61,6 +63,7 @@ public class UserServiceImpl implements UserServices {
 
     @Override
     public UserDto getUserById(Integer id) throws SQLException, ClassNotFoundException {
+        log.info("getUserById started for id: " + id);
         String getUserByIdQuery = "SELECT * FROM user WHERE id=?";
         UserDto userDto = new UserDto();
         Connection conn;
@@ -81,6 +84,7 @@ public class UserServiceImpl implements UserServices {
 
     @Override
     public List<UserDto> getAllUsers() throws SQLException, ClassNotFoundException {
+        log.info("getAllUsers started");
         String getAllUsersQuery = "SELECT * FROM user";
         try (Connection conn = getConnection()) {
             List<UserDto> userSet = new ArrayList<>();
@@ -97,8 +101,24 @@ public class UserServiceImpl implements UserServices {
     }
 
     @Override
-    public void deleteUserById(Integer id) {
-
+    public boolean deleteUserById(Integer id) throws SQLException, ClassNotFoundException {
+        log.info("deleteUserById started for id: " + id);
+        String deleteUserQuery = "DELETE FROM user WHERE id=?";
+        try (Connection conn = getConnection()) {
+            PreparedStatement ps = conn.prepareStatement(deleteUserQuery);
+            ps.setInt(1, id);
+            int deleteCount = ps.executeUpdate();
+            if (deleteCount != 0) {
+                log.info("Data deleted in DB for userId: " + id);
+                return true;
+            } else {
+                log.warning("Failed to delete in DB for userId: " + id);
+                return false;
+            }
+        } catch (Exception e) {
+            log.severe("Error connecting to DB: " + e);
+        }
+        return false;
     }
 
     private User dtoToUser(UserDto userDto) {

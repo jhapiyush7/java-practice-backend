@@ -15,5 +15,5 @@ public interface UserServices {
 
     List<UserDto> getAllUsers() throws SQLException, ClassNotFoundException;
 
-    void deleteUserById(Integer id);
+    boolean deleteUserById(Integer id) throws SQLException, ClassNotFoundException;
 }

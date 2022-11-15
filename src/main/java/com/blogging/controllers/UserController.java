@@ -2,6 +2,7 @@ package com.blogging.controllers;
 
 import com.blogging.payload.UserDto;
 import com.blogging.services.UserServices;
+import com.blogging.utils.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/users")
@@ -38,5 +40,12 @@ public class UserController {
     public ResponseEntity<UserDto> updateUser(@RequestBody UserDto user, @PathVariable int id) throws SQLException, ClassNotFoundException {
         UserDto userDto = this.userServices.updateUser(user, id);
         return ResponseEntity.ok(userDto);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse> deleteUser(@PathVariable Integer id) throws SQLException, ClassNotFoundException {
+        boolean deleted = this.userServices.deleteUserById(id);
+        return deleted ? ResponseEntity.ok(new ApiResponse("Deleted user Successfully", true)) :
+                ResponseEntity.ok(new ApiResponse("Failed to Delete User", false));
     }
 }
