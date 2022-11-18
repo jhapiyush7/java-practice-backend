@@ -3,6 +3,7 @@ package com.blogging.controllers;
 import com.blogging.payload.UserDto;
 import com.blogging.services.UserServices;
 import com.blogging.utils.ApiResponse;
+import com.blogging.utils.TestClass;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -55,4 +56,10 @@ public class UserController {
         return allAdded ? ResponseEntity.ok(new ApiResponse("All users added Successfully", true)) :
                 ResponseEntity.ok(new ApiResponse("Failed to add all/some users", false));
     }
+
+//    @GetMapping("/nothing")
+//    public ResponseEntity<ApiResponse> doNothing(@RequestBody TestClass obj) {
+//        this.userServices.doNothing(obj);
+//        return ResponseEntity.ok(new ApiResponse("Nothing Done", true));
+//    }
 }
