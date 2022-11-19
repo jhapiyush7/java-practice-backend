@@ -1,6 +1,7 @@
 package com.blogging.services.impl;
 
 import com.blogging.entity.User;
+import com.blogging.exception.ResourceNotFoundException;
 import com.blogging.payload.UserDto;
 import com.blogging.repositories.UserRepo;
 import com.blogging.services.UserServices;
@@ -19,7 +20,7 @@ public class UserServiceImpl implements UserServices {
     private UserRepo userRepo;
 
     @Override
-    public UserDto createUser(UserDto user) throws SQLException, ClassNotFoundException {
+    public UserDto createUser(UserDto user) {
         log.info("createUser started for user: " + user);
         String createUserQuery = "INSERT into user(about,email,name,password) values(?,?,?,?)";
         try (Connection conn = getConnection()) {
@@ -40,7 +41,7 @@ public class UserServiceImpl implements UserServices {
     }
 
     @Override
-    public UserDto updateUser(UserDto user, Integer id) throws SQLException, ClassNotFoundException {
+    public UserDto updateUser(UserDto user, Integer id) {
         log.info("updateUser started for id: " + id);
         String updateUserQuery = "UPDATE user SET about=?,email=?,name=?,password=? where id=?";
         try (Connection conn = getConnection()) {
@@ -62,10 +63,10 @@ public class UserServiceImpl implements UserServices {
     }
 
     @Override
-    public UserDto getUserById(Integer id) throws SQLException, ClassNotFoundException {
+    public UserDto getUserById(Integer id) throws SQLException {
         log.info("getUserById started for id: " + id);
         String getUserByIdQuery = "SELECT * FROM user WHERE id=?";
-        UserDto userDto = new UserDto();
+        UserDto userDto = null;
         Connection conn;
         try {
             conn = getConnection();
@@ -83,7 +84,7 @@ public class UserServiceImpl implements UserServices {
     }
 
     @Override
-    public List<UserDto> getAllUsers() throws SQLException, ClassNotFoundException {
+    public List<UserDto> getAllUsers() {
         log.info("getAllUsers started");
         String getAllUsersQuery = "SELECT * FROM user";
         try (Connection conn = getConnection()) {
@@ -101,7 +102,7 @@ public class UserServiceImpl implements UserServices {
     }
 
     @Override
-    public boolean deleteUserById(Integer id) throws SQLException, ClassNotFoundException {
+    public boolean deleteUserById(Integer id) {
         log.info("deleteUserById started for id: " + id);
         String deleteUserQuery = "DELETE FROM user WHERE id=?";
         try (Connection conn = getConnection()) {
@@ -122,7 +123,7 @@ public class UserServiceImpl implements UserServices {
     }
 
     @Override
-    public boolean createUserInBatch(List<UserDto> users) throws SQLException, ClassNotFoundException {
+    public boolean createUserInBatch(List<UserDto> users) {
         log.info("createUserInBatch started for user size: " + users.size());
         String createUserQuery = "INSERT into user(about,email,name,password) values(?,?,?,?)";
         try (Connection conn = getConnection()) {
@@ -165,19 +166,20 @@ public class UserServiceImpl implements UserServices {
         return userDto;
     }
 
-    private Connection getConnection() throws ClassNotFoundException, SQLException {
+    private Connection getConnection() {
         try {
-            Class<?> className = Class.forName("com.mysql.cj.jdbc.Driver");
+            Class.forName("com.mysql.cj.jdbc.Driver");
         } catch (ClassNotFoundException e) {
             log.severe("DB Class not found error: " + e);
         }
+        Connection conn;
         try {
-            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/blogging", "root", "root");
+            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/blogging", "root", "root");
         } catch (SQLException e) {
             log.severe("Error while connecting to DB: " + e);
             return null;
         }
-        return DriverManager.getConnection("jdbc:mysql://localhost:3306/blogging", "root", "root");
+        return conn;
     }
 
     private UserDto fillUserDto(ResultSet rs) throws SQLException {

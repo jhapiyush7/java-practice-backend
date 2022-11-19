@@ -1,6 +1,5 @@
 package com.blogging.services;
 
-import com.blogging.entity.User;
 import com.blogging.payload.UserDto;
 
 import java.sql.SQLException;
