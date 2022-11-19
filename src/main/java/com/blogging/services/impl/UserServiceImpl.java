@@ -41,25 +41,27 @@ public class UserServiceImpl implements UserServices {
     }
 
     @Override
-    public UserDto updateUser(UserDto user, Integer id) {
+    public UserDto updateUser(UserDto user, Integer id) throws SQLException {
         log.info("updateUser started for id: " + id);
         String updateUserQuery = "UPDATE user SET about=?,email=?,name=?,password=? where id=?";
-        try (Connection conn = getConnection()) {
-            PreparedStatement ps = conn.prepareStatement(updateUserQuery);
-            fillQuery(ps, user);
-            ps.setInt(5, id);
-            int updateCount = ps.executeUpdate();
-            if (updateCount != 0) {
-                log.info("Data inserted in DB for user: " + user);
-                return user;
-            } else {
-                log.warning("Failed to insert in DB for user: " + user);
-                return null;
-            }
+        Connection conn = null;
+        try {
+            conn = getConnection();
         } catch (Exception e) {
             log.severe("Error while connecting with DB: " + e);
         }
-        return null;
+        PreparedStatement ps = conn.prepareStatement(updateUserQuery);
+        fillQuery(ps, user);
+        ps.setInt(5, id);
+        int updateCount = ps.executeUpdate();
+        if (updateCount != 0) {
+            log.info("Data inserted in DB for user: " + user);
+            return user;
+        } else {
+            log.warning("Failed to update in DB for userId: " + id);
+            throw new ResourceNotFoundException("User", "userId", id);
+        }
+
     }
 
     @Override
@@ -77,8 +79,12 @@ public class UserServiceImpl implements UserServices {
         PreparedStatement ps = conn.prepareStatement(getUserByIdQuery);
         ps.setInt(1, id);
         ResultSet rs = ps.executeQuery();
-        while (rs.next()) {
-            userDto = fillUserDto(rs);
+        if (!rs.next()) {
+            throw new ResourceNotFoundException("User", "userId", id);
+        } else {
+            do {
+                userDto = fillUserDto(rs);
+            } while (rs.next());
         }
         return userDto;
     }
@@ -102,24 +108,25 @@ public class UserServiceImpl implements UserServices {
     }
 
     @Override
-    public boolean deleteUserById(Integer id) {
+    public boolean deleteUserById(Integer id) throws SQLException {
         log.info("deleteUserById started for id: " + id);
         String deleteUserQuery = "DELETE FROM user WHERE id=?";
-        try (Connection conn = getConnection()) {
-            PreparedStatement ps = conn.prepareStatement(deleteUserQuery);
-            ps.setInt(1, id);
-            int deleteCount = ps.executeUpdate();
-            if (deleteCount != 0) {
-                log.info("Data deleted in DB for userId: " + id);
-                return true;
-            } else {
-                log.warning("Failed to delete in DB for userId: " + id);
-                return false;
-            }
+        Connection conn = null;
+        try {
+            conn = getConnection();
         } catch (Exception e) {
             log.severe("Error connecting to DB: " + e);
         }
-        return false;
+        PreparedStatement ps = conn.prepareStatement(deleteUserQuery);
+        ps.setInt(1, id);
+        int deleteCount = ps.executeUpdate();
+        if (deleteCount != 0) {
+            log.info("Data deleted in DB for userId: " + id);
+            return true;
+        } else {
+            log.warning("Failed to delete in DB for userId: " + id);
+            throw new ResourceNotFoundException("User", "userId", id);
+        }
     }
 
     @Override
